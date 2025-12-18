@@ -1,0 +1,150 @@
+body, html {
+    font-family: 'Cormorant Garamond', serif;
+    color: #5a664a;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.imagen {
+    text-align: center;
+}
+
+.imagen img {
+    width: 50%; /* ancho en píxeles */
+    height: auto; /* mantiene la proporción de la imagen */
+    justify-items: center;
+}
+
+.contenido {
+    text-align: center;
+    font-style: italic;
+    justify-content: center;
+    max-width: 600px; /* ancho máximo del contenedor */
+    margin: 0 auto; /* centra el contenedor */
+    padding: 0 20px; /* espacio en los lados para pantallas pequeñas */
+    line-height: 1.6;
+    font-size: 1.3em;
+}
+
+.formulario {
+    max-width: 400px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.formulario label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.formulario input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1em;
+    font-family: 'Cormorant Garamond', serif;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    color: #5a664a;
+}
+
+.formulario input::placeholder {
+    color: #999;
+}
+
+/* Botón de búsqueda */
+button {
+    font-family: 'Cormorant Garamond', serif; /* misma tipografía */
+    background-color: #5f6b4f; /* verde olivo */
+    color: #f2f1ec; /* texto claro */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: block;
+    margin: 20px auto;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #73825f; /* verde olivo más claro al pasar el mouse */
+}
+
+button:active {
+    background-color: #a8a8a8; /* gris al presionar */
+}
+
+/* Radio buttons (individual o grupo) */
+.botones-asistencia input[type="radio"] {
+    accent-color: #a8a8a8; /* gris cuando seleccionado */
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+/* Checkbox Sí / No */
+.botones-asistencia input[type="checkbox"] {
+    accent-color: #a8a8a8; /* gris cuando seleccionado */
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.pregunta-asistencia {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+.cantidad-invitados {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.lista-invitados p {
+    font-size: 18px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.botones-asistencia {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.botones-asistencia label {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+.botones-asistencia input {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+#resultado {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#resultado div {
+    margin-bottom: 15px;
+}
+
+button:disabled {
+    background-color: #d3d3d3; /* Gris claro cuando está deshabilitado */
+    cursor: not-allowed;
+}
+

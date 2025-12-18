@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Asistencia</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+ 
+</head>
+<body>
+    <div class="imagen"> 
+        <img src="ELIANA & SEBASTIÁN.png" alt="Encabezado">
+    </div>
+
+    <div class="contenido">
+        <h1>¡Nos encantaría contar contigo!</h1>
+        <p>Para confirmar tu asistencia, ingresa tus datos y encontraremos tu invitación. Si tu invitación incluye acompañantes, podrás confirmar la asistencia de todos ellos. Será un verdadero placer celebrar juntos este día tan especial.</p>
+    </div>
+
+    <div class="formulario">
+        <form id="formulario">
+            <label for="celular">Por favor, ingresa tu número de celular</label>
+            <input 
+                type="tel"
+                id="celular"
+                name="celular"
+                placeholder="Ejemplo: 3113386910"
+                required
+            >
+            <button type="submit">Buscar invitación</button>
+        </form>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBk2gQEKaBz16ocgXhTfenlwP1ESlHB7AMkPY4mO-17WfXiGyBWnN4C7ee2SHTihIXCG5GQxXRVU4H/pub?output=csv';
+
+        function obtenerDatos() {
+            return fetch(spreadsheetUrl)
+                .then(response => response.text())
+                .then(csv => parseCSV(csv))
+                .catch(error => console.error('Error al obtener los datos:', error));
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',');
+            const data = lines.slice(1).map(line => {
+                const values = line.split(',');
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header.trim()] = values[index].trim();
+                });
+                return obj;
+            });
+            return data;
+        }
+
+        function buscarInvitacion() {
+            const celular = document.getElementById('celular').value.trim();
+            
+            if (!celular) {
+                document.getElementById('resultado').innerHTML = '<p>Por favor, ingresa tu número de celular.</p>';
+                return;
+            }
+
+            obtenerDatos().then(datos => {
+                const invitacion = datos.find(dato => dato.TELEFONO === celular);
+                if (invitacion) {
+                    const grupo = invitacion.GRUPO;
+                    const personasEnGrupo = datos.filter(dato => dato.GRUPO === grupo);
+
+                    let resultadoHTML = `<p class="cantidad-invitados"><strong>Cantidad de invitados:</strong> ${personasEnGrupo.length}</p>`;
+
+                    resultadoHTML += '<div class="lista-invitados">';
+                    personasEnGrupo.forEach(persona => {
+                        resultadoHTML += `<p>${persona.NOMBRE} ${persona.APELLIDO}</p>`;
+                    });
+                    resultadoHTML += '</div>';
+
+                    // Preguntar por cómo desea confirmar asistencia solo si hay más de un invitado
+                    if (personasEnGrupo.length > 1) {
+                        resultadoHTML += `
+                            <p class="pregunta-asistencia">¿Cómo deseas confirmar la asistencia?</p>
+                            <div class="botones-asistencia">
+                                <label>
+                                    <input type="radio" id="confirmar_individual" name="confirmacion" value="individual">
+                                    Solo para mí
+                                </label>
+                                <label>
+                                    <input type="radio" id="confirmar_grupo" name="confirmacion" value="grupo">
+                                    Para todo el grupo
+                                </label>
+                            </div>
+                        `;
+                    }
+
+                    resultadoHTML += `
+                        <p class="pregunta-asistencia">¿Asistirás a nuestra boda?</p>
+                        <form id="confirmacionForm">
+                            <div class="botones-asistencia">
+                                <label>
+                                    <input type="radio" id="asistencia_si" name="asistencia" value="Sí">
+                                    Sí
+                                </label>
+                                <label>
+                                    <input type="radio" id="asistencia_no" name="asistencia" value="No">
+                                    No
+                                </label>
+                            </div>
+                            <button type="submit">Enviar</button>
+                        </form>
+                    `;
+
+                    document.getElementById('resultado').innerHTML = resultadoHTML;
+
+                    document.getElementById('confirmacionForm').addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        confirmarAsistencia(celular);
+                    });
+                } else {
+                    document.getElementById('resultado').innerHTML = '<p>No se encontró ninguna invitación con ese número de celular.</p>';
+                }
+            });
+        }
+
+        function confirmarAsistencia(celular) {
+            const asistencia_si = document.getElementById('asistencia_si').checked;
+            const asistencia_no = document.getElementById('asistencia_no').checked;
+
+            const confirmar_individual = document.getElementById('confirmar_individual').checked;
+            const confirmar_grupo = document.getElementById('confirmar_grupo').checked;
+
+            if (asistencia_si && asistencia_no) {
+                alert("Solo puedes seleccionar una opción.");
+                return;
+            }
+
+            if (!confirmar_individual && !confirmar_grupo) {
+                alert("Por favor, selecciona si estás confirmando para ti o para todo el grupo.");
+                return;
+            }
+
+            let confirmacionHTML = `<p>¡Gracias por confirmar!</p>`;
+            confirmacionHTML += `<p>Tu asistencia ha sido registrada como: ${asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida')}</p>`;
+            confirmacionHTML += `<p>${confirmar_individual ? 'Confirmaste individualmente.' : 'Confirmaste para todo el grupo.'}</p>`;
+            
+            document.getElementById('resultado').innerHTML = confirmacionHTML;
+        }
+
+        // Para cuando el formulario de búsqueda se envíe
+        document.getElementById('formulario').addEventListener('submit', function(event) {
+            event.preventDefault();
+            buscarInvitacion();
+        });
+
+    </script>
+</body>
+</html>
