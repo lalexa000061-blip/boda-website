@@ -18,7 +18,8 @@
     </div>
 
     <div class="formulario">
-        <form id="formulario">
+        <!-- Formulario configurado para Formspree -->
+        <form id="formulario" action="https://formspree.io/f/xzdpdbgk" method="POST">
             <label for="celular">Por favor, ingresa tu número de celular</label>
             <input 
                 type="tel"
@@ -34,8 +35,8 @@
     </div>
 
     <script>
-        // URL del archivo CSV de Google Sheets
-        const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBk2gQEKaBz16ocgXhTfenlwP1ESlHB7AMkPY4mO-17WfXiGyBWnN4C7ee2SHTihIXCG5GQxXRVU4H/pub?output=csv';
+        // URL del archivo CSV de Google Sheets (actualiza con tu URL real)
+        const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0AtXlzIWAgY5cIyOv9O2yXF5yBzuQlmcSASBzsCZ6jQ98Pljwsrb8ZSv2_nKp8luJUD_heGlfgZ_6/pub?gid=0&single=true&output=csv';
 
         // Función para obtener los datos del CSV
         function obtenerDatos() {
@@ -75,83 +76,115 @@
                     const grupo = invitacion.GRUPO; // Obtener el grupo
                     const personasEnGrupo = datos.filter(dato => dato.GRUPO === grupo); // Filtrar personas en el mismo grupo
 
-                    let resultadoHTML = `<p class="cantidad-invitados"><strong>Cantidad de invitados:</strong> ${personasEnGrupo.length}</p>`;
-
-                    resultadoHTML += '<div class="lista-invitados">';
-                    personasEnGrupo.forEach(persona => {
-                        resultadoHTML += `<p>${persona.NOMBRE} ${persona.APELLIDO}</p>`;
-                    });
-                    resultadoHTML += '</div>';
-
-                    // Mostrar opciones de confirmación si hay más de una persona en el grupo
-                    if (personasEnGrupo.length > 1) {
-                        resultadoHTML += `
-                            <p class="pregunta-asistencia">¿Cómo deseas confirmar la asistencia?</p>
-                            <div class="botones-asistencia">
-                                <label>
-                                    <input type="radio" id="confirmar_individual" name="confirmacion" value="individual">
-                                    Solo para mí
-                                </label>
-                                <label>
-                                    <input type="radio" id="confirmar_grupo" name="confirmacion" value="grupo">
-                                    Para todo el grupo
-                                </label>
-                            </div>
-                        `;
-                    }
-
-                    resultadoHTML += `
-                        <p class="pregunta-asistencia">¿Asistirás a nuestra boda?</p>
-                        <form id="confirmacionForm">
-                            <div class="botones-asistencia">
-                                <label>
-                                    <input type="radio" id="asistencia_si" name="asistencia" value="Sí">
-                                    Sí
-                                </label>
-                                <label>
-                                    <input type="radio" id="asistencia_no" name="asistencia" value="No">
-                                    No
-                                </label>
-                            </div>
-                            <button type="submit">Enviar</button>
-                        </form>
-                    `;
-
-                    document.getElementById('resultado').innerHTML = resultadoHTML;
-
-                    // Manejar el formulario de confirmación de asistencia
-                    document.getElementById('confirmacionForm').addEventListener('submit', function(event) {
-                        event.preventDefault();  // Evitar recarga de la página
-                        confirmarAsistencia(celular);  // Llamar a la función para procesar la confirmación
-                    });
+                    mostrarFormularioConfirmacion(invitacion, personasEnGrupo);  // Mostrar el formulario de confirmación
                 } else {
                     document.getElementById('resultado').innerHTML = '<p>No se encontró ninguna invitación con ese número de celular.</p>';
                 }
             });
         }
 
-        // Función para procesar la confirmación de asistencia
-        function confirmarAsistencia(celular) {
-            const asistencia_si = document.getElementById('asistencia_si').checked;
-            const asistencia_no = document.getElementById('asistencia_no').checked;
-            const confirmar_individual = document.getElementById('confirmar_individual').checked;
-            const confirmar_grupo = document.getElementById('confirmar_grupo').checked;
+        // Función para mostrar las preguntas de confirmación con checkboxes
+        function mostrarFormularioConfirmacion(invitacion, personasEnGrupo) {
+            let resultadoHTML = `<p class="cantidad-invitados"><strong>Cantidad de invitados:</strong> <span class="cantidad-numero">${personasEnGrupo.length}</span></p>`;
+            resultadoHTML += '<form id="confirmacionForm">';
+            resultadoHTML += '<p class="pregunta-seleccion-personas">Selecciona las personas por las que quieres responder:</p>';  <!-- Cambio aquí -->
 
-            if (asistencia_si && asistencia_no) {
-                alert("Solo puedes seleccionar una opción.");
-                return;
-            }
+            // Mostrar los checkboxes para cada persona del grupo
+            personasEnGrupo.forEach(persona => {
+                resultadoHTML += `
+                    <div class="persona-item">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="persona-${persona.TELEFONO}" name="personas" value="${persona.NOMBRE} ${persona.APELLIDO}">
+                        </div>
+                        <div class="nombre-container">
+                            <label for="persona-${persona.TELEFONO}">${persona.NOMBRE} ${persona.APELLIDO}</label>
+                        </div>
+                    </div>
+                `;
+            });
 
-            if (!confirmar_individual && !confirmar_grupo) {
-                alert("Por favor, selecciona si estás confirmando para ti o para todo el grupo.");
-                return;
-            }
+            // Añadir pregunta de confirmación (¿Asistirás?)
+            resultadoHTML += `
+                <p class="pregunta-asistencia">¿Asistirás a nuestra boda?</p>
+                <div class="botones-asistencia">
+                    <label>
+                        <input type="radio" id="asistencia_si" name="asistencia" value="Sí">
+                        Sí
+                    </label>
+                    <label>
+                        <input type="radio" id="asistencia_no" name="asistencia" value="No">
+                        No
+                    </label>
+                </div>
+                <button type="submit">Confirmar asistencia</button>
+            `;
+            resultadoHTML += '</form>';
+            document.getElementById('resultado').innerHTML = resultadoHTML;
 
-            let confirmacionHTML = `<p>¡Gracias por confirmar!</p>`;
-            confirmacionHTML += `<p>Tu asistencia ha sido registrada como: ${asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida')}</p>`;
-            confirmacionHTML += `<p>${confirmar_individual ? 'Confirmaste individualmente.' : 'Confirmaste para todo el grupo.'}</p>`;
-            
-            document.getElementById('resultado').innerHTML = confirmacionHTML;
+            // Manejar el formulario de confirmación de asistencia
+            document.getElementById('confirmacionForm').addEventListener('submit', function(event) {
+                event.preventDefault();  // Evitar recarga de la página
+                enviarFormulario(personasEnGrupo);  // Llamar a la función para enviar la confirmación
+            });
+        }
+
+        // Función para enviar la confirmación de asistencia a Formspree
+        function enviarFormulario(personasEnGrupo) {
+            const asistencia_si = document.getElementById('asistencia_si').checked ? "Sí" : "";
+            const asistencia_no = document.getElementById('asistencia_no').checked ? "No" : "";
+            const personasSeleccionadas = [];
+            const checkboxs = document.querySelectorAll('input[name="personas"]:checked');
+
+            // Crear el array de personas seleccionadas
+            checkboxs.forEach(checkbox => {
+                personasSeleccionadas.push(checkbox.value); // Obtener el nombre completo de la persona
+            });
+
+            // Enviar los datos a Formspree, una fila por cada persona seleccionada
+            personasSeleccionadas.forEach(persona => {
+                const formData = new FormData();
+                formData.append('celular', document.getElementById('celular').value.trim());  // El celular de la persona
+                formData.append('persona', persona);  // Nombre completo de la persona seleccionada
+                formData.append('asistencia', asistencia_si || asistencia_no);  // Asistencia (Sí/No)
+
+                // Enviar cada fila con los datos al servidor de Formspree
+                fetch('https://formspree.io/f/xzdpdbgk', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al enviar la solicitud');
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    if (asistencia_si) {
+                        document.getElementById('resultado').innerHTML = `
+                            <div style="text-align: center; padding: 20px; font-size: 24px;">
+                                <p>¡Gracias por confirmar tu asistencia!</p>
+                                <p>Nos alegra saber que contarás con nosotros en este día tan especial.</p>
+                            </div>
+                        `;
+                    } else if (asistencia_no) {
+                        document.getElementById('resultado').innerHTML = `
+                            <div style="text-align: center; padding: 20px; font-size: 24px;">
+                                <p>Gracias por tu respuesta.</p>
+                                <p>Esperamos que puedas acompañarnos en otro momento.</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar el formulario:', error);
+                    document.getElementById('resultado').innerHTML = `
+                        <div style="color: red; text-align: center;">
+                            <p>Gracias por tu respuesta.</p>
+                        </div>
+                    `;
+                });
+            });
         }
 
         // Para cuando el formulario de búsqueda se envíe

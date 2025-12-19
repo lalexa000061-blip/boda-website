@@ -1,3 +1,4 @@
+/* Estilos Globales */
 body, html {
     font-family: 'Cormorant Garamond', serif;
     color: #5a664a;
@@ -7,27 +8,40 @@ body, html {
     flex-direction: column;
 }
 
+#resultado {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Contenedor y elementos principales */
 .imagen {
     text-align: center;
 }
 
 .imagen img {
-    width: 50%; /* ancho en píxeles */
-    height: auto; /* mantiene la proporción de la imagen */
+    width: 50%;
+    height: auto;
     justify-items: center;
 }
 
 .contenido {
     text-align: center;
     font-style: italic;
-    justify-content: center;
-    max-width: 600px; /* ancho máximo del contenedor */
-    margin: 0 auto; /* centra el contenedor */
-    padding: 0 20px; /* espacio en los lados para pantallas pequeñas */
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
     line-height: 1.6;
     font-size: 1.3em;
 }
 
+.pregunta-seleccion-personas {
+    font-size: 21px; /* Tamaño de letra más grande */
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Formularios y entradas */
 .formulario {
     max-width: 400px;
     margin: 30px auto;
@@ -44,17 +58,17 @@ body, html {
     width: 100%;
     padding: 10px 12px;
     font-size: 1em;
-    font-family: 'Cormorant Garamond', serif;
     border: 1px solid #cfcfcf;
     border-radius: 6px;
     color: #5a664a;
+    font-family: 'Cormorant Garamond', serif; /* Aseguramos que la fuente sea la misma */
 }
 
 .formulario input::placeholder {
+    font-family: 'Cormorant Garamond', serif; /* Aseguramos que el placeholder use la misma fuente */
     color: #999;
 }
 
-/* Botón de búsqueda */
 button {
     font-family: 'Cormorant Garamond', serif; /* misma tipografía */
     background-color: #5f6b4f; /* verde olivo */
@@ -77,24 +91,30 @@ button:active {
     background-color: #a8a8a8; /* gris al presionar */
 }
 
-/* Radio buttons (individual o grupo) */
-.botones-asistencia input[type="radio"] {
+button:disabled {
+    background-color: #d3d3d3; /* Gris claro cuando está deshabilitado */
+    cursor: not-allowed;
+}
+
+/* Estilo para los checkboxes y radio buttons */
+input[type="radio"],
+input[type="checkbox"] {
     accent-color: #a8a8a8; /* gris cuando seleccionado */
     width: 20px;
     height: 20px;
     margin-right: 8px;
 }
 
-/* Checkbox Sí / No */
-.botones-asistencia input[type="checkbox"] {
-    accent-color: #a8a8a8; /* gris cuando seleccionado */
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
+input[type="radio"]:checked,
+input[type="checkbox"]:checked {
+    background-color: #d3d3d3; /* Gris claro cuando el checkbox es seleccionado */
+    border-color: #d3d3d3;
 }
 
-.pregunta-asistencia {
-    font-size: 22px;
+/* Preguntas y texto */
+.pregunta-asistencia,
+.pregunta-invitados {
+    font-size: 25px;
     font-weight: bold;
     margin-bottom: 20px;
     text-align: center;
@@ -102,7 +122,7 @@ button:active {
 }
 
 .cantidad-invitados {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
     margin-top: 20px;
     text-align: center;
@@ -117,9 +137,8 @@ button:active {
 .botones-asistencia {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 40px;
-    margin-bottom: 30px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .botones-asistencia label {
@@ -134,17 +153,48 @@ button:active {
     height: 20px;
 }
 
-#resultado {
-    text-align: center;
-    margin-top: 20px;
+/* Estilo para la lista de personas y los checkboxes */
+.persona-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    justify-content: center;
 }
 
+.checkbox-container {
+    margin-right: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    transform: scale(1.1); /* Ajusta el tamaño de los checkboxes */
+}
+
+.nombre-container {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+}
+
+/* Resultados */
 #resultado div {
     margin-bottom: 15px;
 }
 
-button:disabled {
-    background-color: #d3d3d3; /* Gris claro cuando está deshabilitado */
-    cursor: not-allowed;
+.lista-invitados {
+    font-size: 20px;
+    margin-bottom: 1%;
 }
 
+form {
+    margin-top: 30px;  /* Añadir más espacio entre el botón de búsqueda y el resultado */
+}
+
+#resultado {
+    margin-top: 30px;  /* Más espacio entre el formulario y el resultado */
+}
+
+/* Estilo para los checkboxes cuando están seleccionados */
+input[type="checkbox"]:checked {
+    background-color: #d3d3d3; /* Gris claro cuando el checkbox es seleccionado */
+    border-color: #d3d3d3;
+}
