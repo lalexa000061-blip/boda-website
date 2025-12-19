@@ -34,9 +34,10 @@
     </div>
 
     <script>
+        // URL del archivo CSV de Google Sheets
         const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBk2gQEKaBz16ocgXhTfenlwP1ESlHB7AMkPY4mO-17WfXiGyBWnN4C7ee2SHTihIXCG5GQxXRVU4H/pub?output=csv';
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwW85jWxaeLJMSpZLOHqGhRVZ-0IzUTQvYbLJWLf7X1P7aLEzipk3QlU5Y4lphr-za22w/exec';
 
+        // Función para obtener los datos del CSV
         function obtenerDatos() {
             return fetch(spreadsheetUrl)
                 .then(response => response.text())
@@ -44,6 +45,7 @@
                 .catch(error => console.error('Error al obtener los datos:', error));
         }
 
+        // Función para convertir el CSV a formato JSON
         function parseCSV(csv) {
             const lines = csv.split('\n');
             const headers = lines[0].split(',');
@@ -58,19 +60,20 @@
             return data;
         }
 
+        // Función para buscar la invitación
         function buscarInvitacion() {
-            const celular = document.getElementById('celular').value.trim();
-            
+            const celular = document.getElementById('celular').value.trim(); // Obtener número de celular
+
             if (!celular) {
                 document.getElementById('resultado').innerHTML = '<p>Por favor, ingresa tu número de celular.</p>';
                 return;
             }
 
             obtenerDatos().then(datos => {
-                const invitacion = datos.find(dato => dato.TELEFONO === celular);
+                const invitacion = datos.find(dato => dato.TELEFONO === celular); // Buscar la invitación por celular
                 if (invitacion) {
-                    const grupo = invitacion.GRUPO;
-                    const personasEnGrupo = datos.filter(dato => dato.GRUPO === grupo);
+                    const grupo = invitacion.GRUPO; // Obtener el grupo
+                    const personasEnGrupo = datos.filter(dato => dato.GRUPO === grupo); // Filtrar personas en el mismo grupo
 
                     let resultadoHTML = `<p class="cantidad-invitados"><strong>Cantidad de invitados:</strong> ${personasEnGrupo.length}</p>`;
 
@@ -80,7 +83,7 @@
                     });
                     resultadoHTML += '</div>';
 
-                    // Preguntar por cómo desea confirmar asistencia solo si hay más de un invitado
+                    // Mostrar opciones de confirmación si hay más de una persona en el grupo
                     if (personasEnGrupo.length > 1) {
                         resultadoHTML += `
                             <p class="pregunta-asistencia">¿Cómo deseas confirmar la asistencia?</p>
@@ -116,9 +119,10 @@
 
                     document.getElementById('resultado').innerHTML = resultadoHTML;
 
+                    // Manejar el formulario de confirmación de asistencia
                     document.getElementById('confirmacionForm').addEventListener('submit', function(event) {
-                        event.preventDefault();
-                        confirmarAsistencia(celular);
+                        event.preventDefault();  // Evitar recarga de la página
+                        confirmarAsistencia(celular);  // Llamar a la función para procesar la confirmación
                     });
                 } else {
                     document.getElementById('resultado').innerHTML = '<p>No se encontró ninguna invitación con ese número de celular.</p>';
@@ -126,10 +130,10 @@
             });
         }
 
+        // Función para procesar la confirmación de asistencia
         function confirmarAsistencia(celular) {
             const asistencia_si = document.getElementById('asistencia_si').checked;
             const asistencia_no = document.getElementById('asistencia_no').checked;
-
             const confirmar_individual = document.getElementById('confirmar_individual').checked;
             const confirmar_grupo = document.getElementById('confirmar_grupo').checked;
 
@@ -143,31 +147,17 @@
                 return;
             }
 
-            const respuesta = {
-                celular: celular,
-                asistencia: asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida'),
-                confirmacion: confirmar_individual ? 'Individual' : 'Grupo'
-            };
-
-            // Enviar la respuesta al Google Apps Script
-            fetch(scriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(respuesta)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('resultado').innerHTML = `<p>¡Gracias por confirmar tu asistencia!</p>`;
-            })
-            .catch(error => console.error('Error al enviar los datos:', error));
+            let confirmacionHTML = `<p>¡Gracias por confirmar!</p>`;
+            confirmacionHTML += `<p>Tu asistencia ha sido registrada como: ${asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida')}</p>`;
+            confirmacionHTML += `<p>${confirmar_individual ? 'Confirmaste individualmente.' : 'Confirmaste para todo el grupo.'}</p>`;
+            
+            document.getElementById('resultado').innerHTML = confirmacionHTML;
         }
 
         // Para cuando el formulario de búsqueda se envíe
         document.getElementById('formulario').addEventListener('submit', function(event) {
-            event.preventDefault();
-            buscarInvitacion();
+            event.preventDefault();  // Evitar recarga de la página
+            buscarInvitacion();      // Llamar a la función para buscar la invitación
         });
     </script>
 </body>
