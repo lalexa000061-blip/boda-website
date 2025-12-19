@@ -6,7 +6,6 @@
     <title>Confirmación de Asistencia</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
- 
 </head>
 <body>
     <div class="imagen"> 
@@ -36,6 +35,7 @@
 
     <script>
         const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBk2gQEKaBz16ocgXhTfenlwP1ESlHB7AMkPY4mO-17WfXiGyBWnN4C7ee2SHTihIXCG5GQxXRVU4H/pub?output=csv';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwW85jWxaeLJMSpZLOHqGhRVZ-0IzUTQvYbLJWLf7X1P7aLEzipk3QlU5Y4lphr-za22w/exec';
 
         function obtenerDatos() {
             return fetch(spreadsheetUrl)
@@ -143,11 +143,25 @@
                 return;
             }
 
-            let confirmacionHTML = `<p>¡Gracias por confirmar!</p>`;
-            confirmacionHTML += `<p>Tu asistencia ha sido registrada como: ${asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida')}</p>`;
-            confirmacionHTML += `<p>${confirmar_individual ? 'Confirmaste individualmente.' : 'Confirmaste para todo el grupo.'}</p>`;
-            
-            document.getElementById('resultado').innerHTML = confirmacionHTML;
+            const respuesta = {
+                celular: celular,
+                asistencia: asistencia_si ? 'Sí' : (asistencia_no ? 'No' : 'No respondida'),
+                confirmacion: confirmar_individual ? 'Individual' : 'Grupo'
+            };
+
+            // Enviar la respuesta al Google Apps Script
+            fetch(scriptUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(respuesta)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultado').innerHTML = `<p>¡Gracias por confirmar tu asistencia!</p>`;
+            })
+            .catch(error => console.error('Error al enviar los datos:', error));
         }
 
         // Para cuando el formulario de búsqueda se envíe
@@ -155,7 +169,6 @@
             event.preventDefault();
             buscarInvitacion();
         });
-
     </script>
 </body>
 </html>
